@@ -10,7 +10,7 @@ class StudentProgramStatus extends Model
 {
     protected $table = 'student_program_status'; // Specify the table name
 
-    protected $fillable = ['session', 'status']; // Define fillable attributes
+    protected $fillable = ['session', 'status','part', 'semester']; // Define fillable attributes
 
     // Add any other attributes as needed
 
