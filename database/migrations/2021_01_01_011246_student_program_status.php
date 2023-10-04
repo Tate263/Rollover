@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('session');
             $table->string('part');
             $table->string('semester');
+            $table->string('year');
+            $table->string('studentNumber');
             $table->timestamps();
         });
        

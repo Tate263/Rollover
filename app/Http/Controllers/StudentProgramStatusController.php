@@ -7,10 +7,11 @@ use App\Models\StudentProgramStatus;
 
 class StudentProgramStatusController extends Controller
 {
-   public function rollOver(Request $request)
+    public function rollOver(Request $request)
     {
         // Get all students from the old session (e.g., 2022-2023) except Part 4 Semester 2
         $oldSessionStudents = StudentProgramStatus::where('session', '2022-2023')
+            ->where('status', 'Current')
             ->where(function ($query) {
                 $query->where('part', '!=', 4) // Exclude Part 4
                     ->orWhere(function ($subQuery) {
@@ -18,8 +19,12 @@ class StudentProgramStatusController extends Controller
                     });
             })
             ->get();
-
+            
         foreach ($oldSessionStudents as $student) {
+            // Store the values you want to preserve
+            $studentNumber = $student->studentNumber;
+            $year = $student->year;
+
             // Update the status of current records to 'Old'
             if ($student->status === 'Current') {
                 $student->update(['status' => 'Old']);
@@ -58,22 +63,22 @@ class StudentProgramStatusController extends Controller
             }
 
             // Create a new record for the student in the new session (e.g., 2023-2024) with 'Current' status
-            $newStudent = new StudentProgramStatus([
+            StudentProgramStatus::create([
                 'session' => '2023-2024',
                 'part' => $newPart,
                 'semester' => $newSemester,
-                'status' => 'Current', // Set the status as 'current' for the new record
+                'status' => 'Current',
+                'year' => $year,
+                'studentNumber' => $studentNumber,
                 // Other fields as needed
             ]);
-
-            $newStudent->save();
         }
 
         // Redirect back with a success message
         return redirect()->back()->with('status', 'Students have been rolled over.');
     }
 }
-
+//In this updated code, we use the create method to create a new student record and then save it to the database. This should create new records for the rolled-over students without updating the existing ones.
 
 
 
