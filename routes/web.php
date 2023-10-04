@@ -14,14 +14,8 @@ use App\Http\Controllers\StudentProgramStatus;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route to display the program selection form
+Route::get('/', [StudentProgramStatusController::class, 'index'])->name('program-selection');
 
-// Define the route with the class-based controller and method
-Route::post('/roll-over-students', [StudentProgramStatusController::class, 'rollOver'])->name('student.rollOver');
-
-
-//Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route to handle the rollover process
+Route::post('/rollover', [StudentProgramStatusController::class, 'rollOver'])->name('rollover');

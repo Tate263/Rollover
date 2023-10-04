@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
-        Schema::create('student_program_status',function (Blueprint $table) {
+        Schema::create('degree_programs',function (Blueprint $table) {
             $table->increments('id');
-            $table->string('status');
-            $table->string('session');
-            $table->string('part');
-            $table->string('semester');
-            $table->string('year');
-            $table->string('studentNumber');
-            $table->string('program_code');
-            $table->timestamps();
+            $table->string('code');
+            $table->string('name');
+            //$table->string('part');
+            //$table->string('semester');
+            //$table->string('year');
+            //$table->string('studentNumber');
+            //$table->timestamps();
         });
        
     }

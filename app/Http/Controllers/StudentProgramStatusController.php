@@ -1,17 +1,36 @@
 <?php
 
 namespace App\Http\Controllers;
-//use App\StudentProgramStatus;
-use Illuminate\Http\Request;
 use App\Models\StudentProgramStatus;
+use App\Models\DegreeProgram; // Assuming you have a DegreeProgram model
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Import DB facade
 
 class StudentProgramStatusController extends Controller
 {
+    public function index()
+    {
+        // Fetch the list of program codes from the DegreeProgram model
+        $programCodes = DegreeProgram::pluck('code', 'id');
+
+        return view('program_selection', compact('programCodes'));
+    }
+
     public function rollOver(Request $request)
     {
+        // Validate the form data
+        $request->validate([
+            'program_id' => 'required|exists:degree_programs,id',
+        ]);
+
+        // Get the selected program code
+        $selectedProgramId = $request->input('program_id');
+        $selectedProgram = DegreeProgram::findOrFail($selectedProgramId);
+
         // Get all students from the old session (e.g., 2022-2023) except Part 4 Semester 2
         $oldSessionStudents = StudentProgramStatus::where('session', '2022-2023')
             ->where('status', 'Current')
+            ->where('program_code', $selectedProgram->code)
             ->where(function ($query) {
                 $query->where('part', '!=', 4) // Exclude Part 4
                     ->orWhere(function ($subQuery) {
@@ -19,7 +38,7 @@ class StudentProgramStatusController extends Controller
                     });
             })
             ->get();
-            
+
         foreach ($oldSessionStudents as $student) {
             // Store the values you want to preserve
             $studentNumber = $student->studentNumber;
@@ -70,15 +89,15 @@ class StudentProgramStatusController extends Controller
                 'status' => 'Current',
                 'year' => $year,
                 'studentNumber' => $studentNumber,
+                'program_code' => $selectedProgram->code, // Store the program code
                 // Other fields as needed
             ]);
         }
 
         // Redirect back with a success message
-        return redirect()->back()->with('status', 'Students have been rolled over.');
+        return redirect()->back()->with('status', 'Students have been rolled over for program: ' . $selectedProgram->code);
     }
 }
-//In this updated code, we use the create method to create a new student record and then save it to the database. This should create new records for the rolled-over students without updating the existing ones.
 
 
 
